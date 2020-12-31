@@ -9,38 +9,37 @@ class NonUploadedVideoRepository
     public function __construct(private DatabaseConnection $connection)
     {}
 
-    public function findByTwitterAndYoutubeChannelIds(int $twitterAccountId, int $youtubeChannelId): array
+    public function findByWebsiteAndYoutubeChannelIds(int $websiteCMSId, int $youtubeChannelId): array
     {
         $this->connection->start();
 
-        $postedTwitterPostIds = $this->connection->query('
-            SELECT t.id
-            FROM twitter_post as t
-            RIGHT JOIN twitter_post_youtube_video as tpyv
-            ON t.id = tpyv.twitter_id
-            WHERE t.account_id = :account_id
-        ', ['account_id' => $twitterAccountId]);
-        $postedTwitterPostIds = array_map(fn ($entry) => (int) $entry['id'], $postedTwitterPostIds);
+        $postedWebsitePostIds = $this->connection->query('
+            SELECT w.id
+            FROM website_post as w
+            RIGHT JOIN website_post_youtube_video as wpyt
+            ON w.id = wpyt.website_id
+            WHERE w.website_id = :website_id
+        ', ['website_id' => $websiteCMSId]);
+        $postedWebsitePostIds = array_map(fn ($entry) => (int) $entry['id'], $postedWebsitePostIds);
 
         $postsToPost = $this->connection->query('
             SELECT
                 y.id,
                 y.title,
-                y.url
+                y.url,
+                y.thumbnail,
+                y.description
             FROM youtube_video as y
             ' . (
-                $postedTwitterPostIds
-                    ? 'LEFT JOIN twitter_post_youtube_video as tpyv
-                    ON y.id = tpyv.youtube_id
-                    AND tpyv.twitter_id IN (' . implode(', ', $postedTwitterPostIds) . ')'
+                $postedWebsitePostIds
+                    ? 'LEFT JOIN website_post_youtube_video as wpyt
+                    ON y.id = wpyt.youtube_id
+                    AND wpyt.website_id IN (' . implode(', ', $postedWebsitePostIds) . ')'
                     : ''
             ) . '
-            LEFT JOIN youtube_video_unpostable_on_twitter as yvuot
-            ON yvuot.youtube_id = y.id
             
             WHERE y.channel_id = :channel_id
-            AND yvuot.id IS NULL
-            ' . ($postedTwitterPostIds ? 'AND tpyv.id IS NULL' : '') . '
+            ' . ($postedWebsitePostIds ? 'AND wpyt.id IS NULL' : '') . '
             ;
         ', [
             'channel_id' => $youtubeChannelId

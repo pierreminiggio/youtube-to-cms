@@ -65,7 +65,7 @@ CREATE TABLE `website_post` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
+ALTER TABLE `website_post` ADD `post_id` INT NOT NULL AFTER `website_id`;
 -- --------------------------------------------------------
 
 --

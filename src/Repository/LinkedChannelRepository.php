@@ -14,16 +14,13 @@ class LinkedChannelRepository
         $this->connection->start();
         $channels = $this->connection->query('
             SELECT
-                tayc.youtube_id as y_id,
-                t.id as t_id,
-                t.oauth_access_token,
-                t.oauth_access_token_secret,
-                t.consumer_key,
-                t.consumer_secret,
-                t.tweet_content
-            FROM twitter_account as t
-            RIGHT JOIN twitter_account_youtube_channel as tayc
-                ON t.id = tayc.twitter_id
+            wcyc.youtube_id as y_id,
+                w.id as w_id,
+                w.base_url,
+                w.token
+            FROM website_cms as w
+            RIGHT JOIN website_cms_youtube_channel as wcyc
+                ON w.id = wcyc.website_id
         ', []);
         $this->connection->stop();
 
