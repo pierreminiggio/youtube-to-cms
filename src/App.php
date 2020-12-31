@@ -65,7 +65,7 @@ class App
                     $videoToUploadRepository->insertVideoIfNeeded($res['id'], $linkedChannel['w_id'], $postToPost['id']);
                     echo PHP_EOL . $postToPost['title'] . ' posted !';
                 } else {
-                    echo PHP_EOL . 'Error while posting ' . $postToPost['title'] . ':' . json_encode($res);
+                    echo PHP_EOL . 'Error while posting ' . $postToPost['title'] . ':' . $curlResult;
                 }
             }
 
